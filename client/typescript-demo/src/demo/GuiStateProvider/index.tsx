@@ -13,6 +13,7 @@ export const DialogName = {
     voiceCharacterManagerMainDialog: "voiceCharacterManagerMainDialog",
     voiceCharacterManagerFileUploaderDialog: "voiceCharacterManagerFileUploaderDialog",
     advancedSettingDialog: "advancedSettingDialog",
+    unifiedSettingsDialog: "unifiedSettingsDialog",
     exportToOnnxDialog: "exportToOnnxDialog",
     mergeLabDialog: "mergeLabDialog",
     aboutModelDialog: "aboutModelDialog",
