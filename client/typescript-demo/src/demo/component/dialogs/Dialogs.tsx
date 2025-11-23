@@ -9,6 +9,7 @@ import { VoiceCharacterSlotManagerFileUploadDialog } from "./Dialogs_VoiceCharac
 import { AboutVoiceDialog } from "./Dialogs_AboutVoiceDialog";
 import { AboutModelDialog } from "./Dialogs_AboutModelDialog";
 import { AdvancedSettingDialog } from "./Dialogs_AdvancedSettingDialog";
+import { UnifiedSettingsDialog } from "./Dialogs_UnifiedSettingsDialog";
 import { EmotionColorDialog } from "./Dialogs_EmotionColorDialog";
 import { ModelSlotManagerSamplesDialog } from "./Dialogs_ModelSlotManagerSamplesDialog";
 import { VoiceCharacterSlotManagerSamplesDialog } from "./Dialogs_VoiceCharacterSlotManagerSamplesDialog";
@@ -55,6 +56,8 @@ export const Dialogs = () => {
             return <VoiceCharacterSlotManagerFileUploadDialog slotIndex={targetSlotIndex}></VoiceCharacterSlotManagerFileUploadDialog>;
         } else if (guiState.dialogName === "advancedSettingDialog") {
             return <AdvancedSettingDialog></AdvancedSettingDialog>;
+        } else if (guiState.dialogName === "unifiedSettingsDialog") {
+            return <UnifiedSettingsDialog></UnifiedSettingsDialog>;
         } else if (guiState.dialogName === "aboutModelDialog") {
             return <AboutModelDialog></AboutModelDialog>;
         } else if (guiState.dialogName === "aboutVoiceDialog") {

@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { isDesktopApp } from "../../util/isDesctopApp";
+import { FaQuestionCircle, FaCog } from "react-icons/fa";
 import {
     button,
     headerArea,
@@ -21,173 +22,75 @@ import { HeaderIcon } from "../../styles/style-components/icons/01_header-icon.c
 import { BasicButton } from "../../styles/style-components/buttons/01_basic-button.css";
 import { BasicInput } from "../../styles/style-components/inputs/01_basic-input.css";
 import { headerButtonThema } from "../../styles/style-components/buttons/thema/button-thema.css";
+import { Dropdown, DropdownItem } from "../common/Dropdown";
 
 export type HeaderAreaProps = {};
 
 export const HeaderArea = (props: HeaderAreaProps) => {
     const { t, i18n } = useTranslation();
-    const { guiSetting, serverConfigState, generateGetPathFunc } = useAppRoot();
-    const { setDialog2Name, setDialog2Props } = useGuiState();
+    const { guiSetting, generateGetPathFunc } = useAppRoot();
+    const { setDialogName } = useGuiState();
     const { displayColorMode, setDisplayColorMode } = useAppState();
 
-    const githubLink = useMemo(() => {
-        const iconUrl = generateGetPathFunc("/assets/icons/github.svg");
-        return isDesktopApp() ? (
-            <span
-                className={tooltip}
-                onClick={() => {
-                    // @ts-ignore
-                    window.electronAPI.openBrowser("https://github.com/w-okada/ttsclient");
-                }}
-            >
-                <img src={iconUrl} className={HeaderIcon()} />
-                <div className={tooltipText}>{t("header_github")}</div>
-            </span>
-        ) : (
-            <a className={tooltip} href="https://github.com/w-okada/ttsclient" target="_blank" rel="noopener noreferrer">
-                <img src={iconUrl} className={HeaderIcon()} />
-                <div className={tooltipText}>{t("header_github")}</div>
-            </a>
-        );
-    }, [i18n.language]);
-
-    const manualLink = useMemo(() => {
-        const iconUrl = generateGetPathFunc("/assets/icons/help-circle.svg");
-        return isDesktopApp() ? (
-            <span
-                className={tooltip}
-                onClick={() => {
-                    // @ts-ignore
-                    window.electronAPI.openBrowser("https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_ja_latest.md");
-                }}
-            >
-                <img src={iconUrl} className={HeaderIcon()} />
-                <div className={`${tooltipText} ${tooltipText100px}`}>{t("header_manual")}</div>
-            </span>
-        ) : (
-            <a
-                className={tooltip}
-                href="https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_ja_latest.md"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                <img src={iconUrl} className={HeaderIcon()} />
-                <div className={`${tooltipText} ${tooltipText100px}`}>{t("header_manual")}</div>
-            </a>
-        );
-    }, [i18n.language]);
-
-    const toolLink = useMemo(() => {
-        const iconUrl = generateGetPathFunc("/assets/icons/monitor.svg");
-        return isDesktopApp() ? (
-            <span
-                className={tooltip}
-                onClick={() => {
-                    // @ts-ignore
-                    window.electronAPI.openBrowser("https://w-okada.github.io/screen-recorder-ts/");
-                }}
-            >
-                <img src={iconUrl} className={HeaderIcon()} />
-                <div className={`${tooltipText} ${tooltipText100px}`}>{t("header_screen_recorder")}</div>
-            </span>
-        ) : (
-            <a className={tooltip} href="https://w-okada.github.io/screen-recorder-ts/" target="_blank" rel="noopener noreferrer">
-                <img src={iconUrl} className={HeaderIcon()} />
-                <div className={`${tooltipText} ${tooltipText100px}`}>{t("header_screen_recorder")}</div>
-            </a>
-        );
-    }, [i18n.language]);
-
-    const coffeeLink = useMemo(() => {
-        const iconUrl = generateGetPathFunc("/assets/icons/buymeacoffee.png");
-        return isDesktopApp() ? (
-            <span
-                className={tooltip}
-                onClick={() => {
-                    // @ts-ignore
-                    window.electronAPI.openBrowser("https://www.buymeacoffee.com/wokad");
-                }}
-            >
-                <img src={iconUrl} className={HeaderIcon()} />
-                <div className={`${tooltipText} ${tooltipText100px}`}>{t("header_support")}</div>
-            </span>
-        ) : (
-            <a className={tooltip} href="https://www.buymeacoffee.com/wokad" target="_blank" rel="noopener noreferrer">
-                <img src={iconUrl} className={HeaderIcon()} />
-                <div className={`${tooltipText} ${tooltipText100px}`}>{t("header_support")}</div>
-            </a>
-        );
-    }, [i18n.language]);
-
-    const langSelector = useMemo(() => {
-        if (!guiSetting.setting) {
-            return <> </>;
+    const openLink = (url: string) => {
+        if (isDesktopApp()) {
+            // @ts-ignore
+            window.electronAPI.openBrowser(url);
+        } else {
+            window.open(url, "_blank", "noopener,noreferrer");
         }
-        const languages = guiSetting.setting.lang;
-        return (
-            <div>
-                <span>{t("header_language")}:</span>
-                <select
-                    defaultValue={i18n.language}
-                    onChange={(event) => {
-                        Logger.getLogger().info("change lang", event.target.value, i18n.language);
-                        i18n.changeLanguage(event.target.value);
-                        location.reload();
-                    }}
-                    className={BasicInput()}
-                >
-                    {languages.map((lang) => (
-                        <option key={lang} value={lang}>
-                            {lang}
-                        </option>
-                    ))}
-                </select>
-            </div>
-        );
-    }, [i18n.language, guiSetting.setting?.lang]);
+    };
 
-    const initializeButton = useMemo(() => {
-        const onClearSettingClicked = async () => {
-            let ok = false;
-            const p = new Promise<boolean>((resolve) => {
-                setDialog2Props({
-                    title: t("header_initialize_confirm_dialog_title"),
-                    instruction: `${t("header_initialize_confirm_dialog_instruction")}`,
-                    defaultValue: "",
-                    resolve: resolve,
-                    options: null,
-                });
-                setDialog2Name("confirmDialog");
-            });
-            const res = await p;
-            if (res == true) {
-                ok = true;
-            } else {
-                ok = false;
-            }
-
-            if (ok) {
-                await serverConfigState.initializeServer();
-                // await voiceChangerClientState.clearDb();
-                // location.reload();
-            }
-        };
-
-        return (
-            <button className={`${BasicButton()} ${headerButtonThema}`} onClick={onClearSettingClicked}>
-                {t("header_initialize")}
-            </button>
-        );
-    }, [i18n.language, displayColorMode]);
-
+    const helpDropdownItems: DropdownItem[] = useMemo(() => {
+        return [
+            {
+                label: t("header_github"),
+                onClick: () => openLink("https://github.com/w-okada/ttsclient"),
+                icon: generateGetPathFunc("/assets/icons/github.svg"),
+            },
+            {
+                label: t("header_manual"),
+                onClick: () => openLink("https://github.com/w-okada/voice-changer/blob/master/tutorials/tutorial_rvc_ja_latest.md"),
+                icon: generateGetPathFunc("/assets/icons/help-circle.svg"),
+            },
+            {
+                label: t("header_screen_recorder"),
+                onClick: () => openLink("https://w-okada.github.io/screen-recorder-ts/"),
+                icon: generateGetPathFunc("/assets/icons/monitor.svg"),
+            },
+            {
+                label: t("header_support"),
+                onClick: () => openLink("https://www.buymeacoffee.com/wokad"),
+                icon: generateGetPathFunc("/assets/icons/buymeacoffee.png"),
+            },
+        ];
+    }, [i18n.language]);
 
     const displayColorModeButton = useMemo(() => {
         return (
-            <button className={`${BasicButton()} ${headerButtonThema}`} onClick={() => {
-                setDisplayColorMode(displayColorMode == "light" ? "dark" : "light")
-            }}>{displayColorMode == "light" ? t("header_to_dark_label") : t("header_to_light_label")}</button>
+            <button
+                className={`${BasicButton()} ${headerButtonThema}`}
+                onClick={() => {
+                    setDisplayColorMode(displayColorMode == "light" ? "dark" : "light");
+                }}
+            >
+                {displayColorMode == "light" ? t("header_to_dark_label") : t("header_to_light_label")}
+            </button>
         );
     }, [displayColorMode]);
+
+    const settingsButton = useMemo(() => {
+        return (
+            <button
+                className={`${BasicButton()} ${headerButtonThema}`}
+                onClick={() => setDialogName("unifiedSettingsDialog")}
+                style={{ display: "flex", alignItems: "center", gap: "5px" }}
+            >
+                <FaCog />
+                {t("header_settings")}
+            </button>
+        );
+    }, [i18n.language]);
 
     const header = useMemo(() => {
         return (
@@ -200,21 +103,25 @@ export const HeaderArea = (props: HeaderAreaProps) => {
                 </div>
                 <div className={iconArea}>
                     <span className={iconGroup}>
-                        {githubLink}
-                        {manualLink}
-                        {toolLink}
-                        {coffeeLink}
-                        {/* {licenseButton} */}
+                        <Dropdown
+                            label={
+                                <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                                    <FaQuestionCircle />
+                                    {t("header_help")}
+                                </div>
+                            }
+                            items={helpDropdownItems}
+                            buttonClassName={`${BasicButton()} ${headerButtonThema}`}
+                        />
                     </span>
-                    <span className={iconGroup}>{langSelector}</span>
                     <span className={iconGroup}>
-                        {initializeButton}
+                        {settingsButton}
                         {displayColorModeButton}
                     </span>
                 </div>
             </div>
         );
-    }, [guiSetting.version, guiSetting.edition, i18n.language, displayColorModeButton]);
+    }, [guiSetting.version, guiSetting.edition, i18n.language, displayColorModeButton, settingsButton, helpDropdownItems]);
 
     return header;
 };
